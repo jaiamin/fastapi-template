@@ -1,37 +1,45 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, select
 
-from . import models, schemas
-from .core.security import get_password_hash
-
-
-def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+from .core.security import get_password_hash, verify_password
+from .schemas import UserCreate, User, DatasetCreate, Dataset, ImageCreate, Image
 
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+def create_user(*, session: Session, user_create: UserCreate) -> User:
+    db_obj = User.model_validate(
+        user_create, update={'hashed_password': get_password_hash(user_create.password)}
+    )
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
 
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
+def get_user_by_email(*, session: Session, email: str) -> User | None:
+    statement = select(User).where(User.email == email)
+    session_user = session.execute(statement).first()
+    return session_user
 
 
-def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = get_password_hash(user.password)
-    db_user = models.User(email=user.email, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+def authenticate(*, session: Session, email: str, password: str) -> User | None:
+    db_user = get_user_by_email(session=session, email=email)
+    if not db_user:
+        return None
+    if not verify_password(password, db_user.hashed_password):
+        return None
+    return None
 
 
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Item).offset(skip).limit(limit).all()
+def create_dataset(*, session: Session, ds_in: DatasetCreate, user_id: int) -> Dataset:
+    db_ds = Dataset.model_validate(ds_in, update={'user_id': user_id})
+    session.add(db_ds)
+    session.commit()
+    session.refresh(db_ds)
+    return db_ds
 
 
-def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.model_dump(), owner_id=user_id)
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
+def create_image(*, session: Session, image_in: ImageCreate, dataset_id: int) -> Image:
+    db_image = Image.model_validate(image_in, update={'dataset_id': dataset_id})
+    session.add(db_image)
+    session.commit()
+    session.refresh(db_image)
+    return db_image

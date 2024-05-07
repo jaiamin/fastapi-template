@@ -1,0 +1,1 @@
+Backend using FastAPI, PostgreSQL (via SQLAlchemy)

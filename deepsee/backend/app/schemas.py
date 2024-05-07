@@ -1,25 +1,46 @@
-from pydantic import BaseModel
+from datetime import datetime
+
+from pydantic import BaseModel, EmailStr
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: str | None = None
+class ImageBase(BaseModel):
+    uuid: str
 
 
-class ItemCreate(ItemBase):
+class ImageCreate(ImageBase):
     pass
 
 
-class Item(ItemBase):
+class Image(ImageBase):
     id: int
-    owner_id: int
+    dataset_id: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+
+class DatasetBase(BaseModel):
+    title: str
+    tags: str
+
+
+class DatasetCreate(DatasetBase):
+    pass
+
+
+class Dataset(DatasetBase):
+    id: int
+    creation_date: datetime = datetime.now()
+    user_id: int
+    images: list[Image] = []
+
+    class Config:
+        orm_mode = True
 
 
 class UserBase(BaseModel):
-    email: str
+    email: EmailStr
+    is_active: bool = True
 
 
 class UserCreate(UserBase):
@@ -28,8 +49,19 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    is_active: bool
-    items: list[Item] = []
+    hashed_password: str
+    datasets: list[Dataset] = []
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+
+# JSON payload containing access token
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+# Contents of JWT token
+class TokenPayload(BaseModel):
+    sub: int | None = None

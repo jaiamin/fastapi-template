@@ -1,18 +1,39 @@
 import os
 
-from pydantic import PostgresDsn, computed_field
+from typing import Annotated, Any
+
+from pydantic import (
+    BeforeValidator, 
+    PostgresDsn, 
+    AnyUrl,
+    computed_field
+)
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def parse_cors(v: Any) -> list[str] | str:
+    if isinstance(v, str) and not v.startswith('['):
+        # e.g. "http://localhost,http://localhost:8000"
+        return [i.strip() for i in v.split(',')]
+    elif isinstance(v, list | str):
+        # e.g. ["http://localhost","http://localhost:8000"]
+        return v
+    raise ValueError(v)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='./.env', env_file_encoding='utf-8', case_sensitive=True
+        env_file='.env', env_file_encoding='utf-8', case_sensitive=True
     )
 
+    BACKEND_CORS_ORIGINS: Annotated[
+        list[AnyUrl] | str, BeforeValidator(parse_cors)
+    ]
+
     SECRET_KEY: str
-    ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    ALGORITHM: str = 'HS256'
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     SERVER_HOST: str
     SERVER_PORT: int
@@ -26,7 +47,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
 
     @computed_field
-    @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
         return MultiHostUrl.build(
             scheme='postgresql',
@@ -38,10 +58,9 @@ class Settings(BaseSettings):
         )
     
 
-
 class ContainerDevSettings(Settings):
     model_config = SettingsConfigDict(
-        env_file='./.env', env_file_encoding='utf-8', case_sensitive=True
+        env_file='.env', env_file_encoding='utf-8', case_sensitive=True
     )
     ENV: str = 'dev'
 

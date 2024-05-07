@@ -1,10 +1,23 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Boolean, 
+    Column, 
+    ForeignKey, 
+    Integer, 
+    String,
+    DateTime,
+    Enum
+)
+from sqlalchemy.orm import relationship, validates
+from sqlalchemy.sql import func
 
-from .core.db import Base
+from .db import Base
+from .utils import DatasetType
 
 
 class User(Base):
+    """
+    Represents a DeepSee User.
+    """
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -12,15 +25,38 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 
-    items = relationship('Item', back_populates='owner')
+    datasets = relationship('Dataset', back_populates='user')
+
+    @validates('email')
+    def validate_email(self, key, email):
+        assert '@' in email
+        return email
 
 
-class Item(Base):
-    __tablename__ = 'items'
+class Dataset(Base):
+    """
+    Represents a DeepSee Dataset created by a User.
+    """
+    __tablename__ = 'datasets'
 
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey('users.id'))
+    creation_date = Column(DateTime, default=func.now())
+    tags = Column(Enum(DatasetType))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    
+    user = relationship('User', back_populates='datasets')
+    images = relationship('Image', back_populates='dataset')
 
-    owner = relationship('User', back_populates='items')
+
+class Image(Base):
+    """
+    Represents a pixel Image in a given Dataset.
+    """
+    __tablename__ = 'images'
+
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String, unique=True)
+    dataset_id = Column(Integer, ForeignKey('datasets.id'))
+
+    dataset = relationship('Dataset', back_populates='images')
