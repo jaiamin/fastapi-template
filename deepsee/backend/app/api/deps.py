@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from deepsee.backend.app.core.config import settings
-from deepsee.backend.app.db import engine
+from deepsee.backend.app.core.db import get_local_session
 from deepsee.backend.app.schemas import TokenPayload, User
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -17,8 +17,11 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 
 def get_db() -> Generator[Session, None, None]:
-    with Session(bind=engine) as session:
-        yield session
+    db = get_local_session(str(settings.SQLALCHEMY_DATABASE_URI), echo=False)()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 SessionDep = Annotated[Session, Depends(get_db)]

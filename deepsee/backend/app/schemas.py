@@ -3,14 +3,17 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
 
+# Base class for Image
 class ImageBase(BaseModel):
     uuid: str
 
 
+# Create class for Image
 class ImageCreate(ImageBase):
     pass
 
 
+# Internal class for Image
 class Image(ImageBase):
     id: int
     dataset_id: int
@@ -19,24 +22,23 @@ class Image(ImageBase):
         from_attributes = True
 
 
+# Public class for Image
 class ImagePublic(ImageBase):
-    id: int
+    pass
 
 
-class ImagesPublic(BaseModel):
-    data: list[ImagePublic]
-    count: int
-
-
+# Base class for Dataset
 class DatasetBase(BaseModel):
     title: str
     tags: str
 
 
+# Create class for Dataset
 class DatasetCreate(DatasetBase):
     pass
 
 
+# Internal class for Dataset
 class Dataset(DatasetBase):
     id: int
     creation_date: datetime = datetime.now()
@@ -47,26 +49,26 @@ class Dataset(DatasetBase):
         from_attributes = True
 
 
+# Public class for Dataset
 class DatasetPublic(DatasetBase):
-    id: int
+    creation_date: datetime = datetime.now()
     user_id: int
+    images: list[Image] = []
 
 
-class DatasetsPublic(BaseModel):
-    data: list[DatasetPublic]
-    count: int
-
-
+# Base class for User
 class UserBase(BaseModel):
     email: EmailStr
     is_active: bool = True
     is_superuser: bool = False
 
 
+# Create class for User
 class UserCreate(UserBase):
     password: str
 
 
+# Internal class for User
 class User(UserBase):
     id: int
     hashed_password: str
@@ -76,14 +78,9 @@ class User(UserBase):
         from_attributes = True
 
 
-# Properties to return via API, id always required
+# Public class for User
 class UserPublic(UserBase):
-    id: int
-
-
-class UsersPublic(BaseModel):
-    data: list[UserPublic]
-    count: int
+    datasets: list[Dataset] = []
 
 
 # JSON payload containing access token

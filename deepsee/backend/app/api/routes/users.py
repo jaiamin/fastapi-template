@@ -12,8 +12,6 @@ from deepsee.backend.app.core.security import get_password_hash, verify_password
 from deepsee.backend.app import models
 from deepsee.backend.app.schemas import (
     UserCreate,
-    UserPublic,
-    UsersPublic,
 )
 
 router = APIRouter()
