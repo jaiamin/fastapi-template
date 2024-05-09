@@ -1,12 +1,17 @@
-from sqlalchemy.orm import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from .core.security import get_password_hash, verify_password
-from .schemas import UserCreate, User, DatasetCreate, Dataset, ImageCreate, Image
+from .models import User
+from .schemas import UserCreate, DatasetCreate, Dataset, ImageCreate, Image
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
-    db_obj = User.model_validate(
-        user_create, update={'hashed_password': get_password_hash(user_create.password)}
+    db_obj = User(
+        email=user_create.email,
+        hashed_password=get_password_hash(user_create.password),
+        is_active=user_create.is_active,
+        is_superuser=user_create.is_superuser
     )
     session.add(db_obj)
     session.commit()
@@ -26,7 +31,7 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
         return None
     if not verify_password(password, db_user.hashed_password):
         return None
-    return None
+    return db_user
 
 
 def create_dataset(*, session: Session, ds_in: DatasetCreate, user_id: int) -> Dataset:

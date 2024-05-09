@@ -16,7 +16,16 @@ class Image(ImageBase):
     dataset_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class ImagePublic(ImageBase):
+    id: int
+
+
+class ImagesPublic(BaseModel):
+    data: list[ImagePublic]
+    count: int
 
 
 class DatasetBase(BaseModel):
@@ -35,12 +44,23 @@ class Dataset(DatasetBase):
     images: list[Image] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class DatasetPublic(DatasetBase):
+    id: int
+    user_id: int
+
+
+class DatasetsPublic(BaseModel):
+    data: list[DatasetPublic]
+    count: int
 
 
 class UserBase(BaseModel):
     email: EmailStr
     is_active: bool = True
+    is_superuser: bool = False
 
 
 class UserCreate(UserBase):
@@ -53,7 +73,17 @@ class User(UserBase):
     datasets: list[Dataset] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+# Properties to return via API, id always required
+class UserPublic(UserBase):
+    id: int
+
+
+class UsersPublic(BaseModel):
+    data: list[UserPublic]
+    count: int
 
 
 # JSON payload containing access token
