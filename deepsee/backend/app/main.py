@@ -6,6 +6,8 @@ from fastapi import (
 )
 from starlette.middleware.cors import CORSMiddleware
 
+from . import crud
+from .api.deps import SessionDep
 from .api.main import api_router
 from .core.config import settings
 
@@ -40,3 +42,16 @@ async def db_session_middleware(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers['X-Process-Time'] = str(process_time)
     return response
+
+
+@app.get('/')
+def get_home_page(*, session: SessionDep):
+    return {
+        'title': 'DeepSee',
+        'description': 'DeepSee is a collaborative platform for creating and sharing open-source computer vision datasets.',
+        'stats': {
+            'num_datasets': crud.get_num_datasets(session=session),
+            'num_users': crud.get_num_users(session=session),
+            'num_images': crud.get_num_images(session=session),
+        }
+    }

@@ -13,7 +13,7 @@ from deepsee.backend.app.schemas import Token
 router = APIRouter()
 
 
-@router.post('/login/access-token')
+@router.post('/login')
 def login_access_token(
     session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:

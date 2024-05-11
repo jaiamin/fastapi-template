@@ -59,8 +59,6 @@ class DatasetPublic(DatasetBase):
 # Base class for User
 class UserBase(BaseModel):
     email: EmailStr
-    is_active: bool = True
-    is_superuser: bool = False
 
 
 # Create class for User
@@ -72,6 +70,8 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     hashed_password: str
+    is_active: bool = True
+    is_superuser: bool = False
     datasets: list[Dataset] = []
 
     class Config:

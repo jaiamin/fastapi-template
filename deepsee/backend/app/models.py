@@ -28,6 +28,11 @@ class User(Base):
 
     datasets = relationship('Dataset', back_populates='user')
 
+    @validates('email')
+    def validate_email(self, key, email):
+        assert '@' in email
+        return email
+
 
 class Dataset(Base):
     """
@@ -36,9 +41,9 @@ class Dataset(Base):
     __tablename__ = 'datasets'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False, index=True)
+    title = Column(String, index=True)
     creation_date = Column(DateTime, server_default=func.now())
-    tags = Column(Enum(DatasetType), nullable=False)
+    tags = Column(Enum(DatasetType))
     user_id = Column(Integer, ForeignKey('users.id'))
     
     user = relationship('User', back_populates='datasets')
