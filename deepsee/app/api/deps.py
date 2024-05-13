@@ -6,11 +6,11 @@ from jose import JWTError, jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from deepsee.backend.app.core.security import reusable_oauth2
-from deepsee.backend.app import models
-from deepsee.backend.app.core.config import settings
-from deepsee.backend.app.core.db import get_local_session
-from deepsee.backend.app.schemas import TokenPayload, User
+from app.core.security import reusable_oauth2
+from app import models
+from app.core.config import settings
+from app.core.db import get_local_session
+from app.schemas import TokenPayload, User
 
 
 def get_db() -> Generator[Session, None, None]:

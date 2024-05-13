@@ -10,8 +10,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 
-from .core.base_class import Base
-from .utils import DatasetType
+from app.core.base_class import Base
+from app.utils import DatasetType
 
 
 class User(Base):

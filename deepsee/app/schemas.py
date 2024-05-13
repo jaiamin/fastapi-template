@@ -64,14 +64,19 @@ class UserBase(BaseModel):
 # Create class for User
 class UserCreate(UserBase):
     password: str
+    is_active: bool = True
+    is_superuser: bool = False
+
+
+# Update class for User
+class UserUpdate(UserBase):
+    pass
 
 
 # Internal class for User
 class User(UserBase):
     id: int
     hashed_password: str
-    is_active: bool = True
-    is_superuser: bool = False
     datasets: list[Dataset] = []
 
     class Config:

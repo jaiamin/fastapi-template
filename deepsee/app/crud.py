@@ -1,11 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .core.security import get_password_hash, verify_password
-from . import models
-from .schemas import (
+from app.core.security import get_password_hash, verify_password
+from app import models
+from app.schemas import (
     User,
-    UserCreate, 
+    UserCreate,
+    UserUpdate, 
     DatasetCreate, 
     Dataset, 
     ImageCreate, 
@@ -26,15 +27,23 @@ def create_user(*, session: Session, user_create: UserCreate) -> models.User:
     return db_obj
 
 
+def update_user(*, session: Session, user: models.User, user_in: UserUpdate):
+    user_data = user_in.model_dump(exclude_unset=True)
+    for k, v in user_data.items():
+        setattr(user, k, v)
+    session.commit()
+    return user
+
+
 def delete_user(*, session: Session, user: User) -> int:
-    db_obj = models.User(**user.__dict__)
+    db_obj = session.query(models.User).filter(models.User.id == user.id).first()
     session.delete(db_obj)
     session.commit()
     return db_obj.id
 
 
 def get_user_by_email(*, session: Session, email: str) -> models.User | None:
-    statement = select(models.User).where(models.User.email == models.User)
+    statement = select(models.User).where(models.User.email == email)
     session_user = session.execute(statement).first()
     if not session_user:
         return None
@@ -64,15 +73,3 @@ def create_image(*, session: Session, image_in: ImageCreate, dataset_id: int) ->
     session.commit()
     session.refresh(db_image)
     return db_image
-
-
-def get_num_datasets(*, session: Session):
-    return session.query(models.Dataset).count()
-
-
-def get_num_users(*, session: Session):
-    return session.query(models.User).count()
-
-
-def get_num_images(*, session: Session):
-    return session.query(models.Image).count()

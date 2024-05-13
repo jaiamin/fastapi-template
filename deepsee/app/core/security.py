@@ -4,7 +4,7 @@ from jose import jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 
-from deepsee.backend.app.core.config import settings
+from app.core.config import settings
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl='login'

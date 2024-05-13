@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .routes import auth, users, datasets
+from app.api.routes import auth, users, datasets
 
 api_router = APIRouter()
 api_router.include_router(auth.router, tags=['auth'])
