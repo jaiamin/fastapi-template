@@ -18,7 +18,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
 # Install system dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
+    && apt-get install --no-install-suggests --no-install-recommends -y \
         curl \
         build-essential
 
@@ -30,7 +30,7 @@ WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 
 # Install project dependencies - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
-RUN poetry install
+RUN poetry install --no-interaction --no-ansi
 
 
 # Set work directory
