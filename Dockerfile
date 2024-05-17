@@ -33,11 +33,8 @@ COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-interaction --no-ansi
 
 
-# Set work directory
+# Create work directory
 WORKDIR /deepsee
-
-# Copy alembic.ini for database migrations
-COPY alembic.ini /
 
 # Expose port
 EXPOSE 8000
