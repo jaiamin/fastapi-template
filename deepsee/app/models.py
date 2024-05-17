@@ -2,7 +2,7 @@ from sqlalchemy import (
     Boolean, 
     Column, 
     ForeignKey, 
-    Integer, 
+    Integer,  
     String,
     DateTime,
     Enum
@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
 
 from app.core.base_class import Base
-from app.utils import DatasetType
+from app.enums import DatasetType
 
 
 class User(Base):
@@ -34,6 +34,7 @@ class User(Base):
         return email
 
 
+# Blobset
 class Dataset(Base):
     """
     Represents a DeepSee Dataset created by a User.

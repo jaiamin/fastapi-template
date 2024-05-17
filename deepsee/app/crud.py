@@ -1,15 +1,14 @@
+from enum import Enum
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app import models
+from app.enums import DatasetType
 from app.schemas import (
-    User,
     UserCreate,
     UserUpdate, 
     DatasetCreate, 
-    Dataset, 
-    ImageCreate, 
-    Image
+    ImageCreate,
 )
 
 
@@ -71,17 +70,39 @@ def authenticate(*, session: Session, email: str, password: str) -> models.User 
     return user
 
 
-# def create_dataset(*, session: Session, ds_in: DatasetCreate, user_id: int) -> Dataset:
-#     db_ds = Dataset.model_validate(ds_in, update={'user_id': user_id})
-#     session.add(db_ds)
-#     session.commit()
-#     session.refresh(db_ds)
-#     return db_ds
+
+def get_dataset_by_title(*, session: Session, dataset_title: str) -> models.Dataset | None:
+    """Returns a deepsee dataset based on the given dataset title."""
+    return session.query(models.Dataset).filter(models.Dataset.title == dataset_title).one_or_none()
 
 
-# def create_image(*, session: Session, image_in: ImageCreate, dataset_id: int) -> Image:
-#     db_image = Image.model_validate(image_in, update={'dataset_id': dataset_id})
-#     session.add(db_image)
-#     session.commit()
-#     session.refresh(db_image)
-#     return db_image
+def get_datasets(*, session: Session) -> list[models.Dataset]:
+    """Retrieve all datasets stored on deepsee."""
+    return session.query(models.Dataset).all()
+
+
+def get_user_datasets(*, session: Session, uid: int) -> list[models.Dataset]:
+    """Retrieve a user's datasets stored on deepsee."""
+    return session.query(models.Dataset).filter(models.Dataset.id == uid).all()
+
+
+def create_dataset(*, session: Session, dataset_in: DatasetCreate, uid: int) -> models.Dataset:
+    """Create a new dataset associated with a user."""
+    dataset = models.Dataset(
+        title=dataset_in.title,
+        tags=dataset_in.tags,
+        user_id=uid, 
+    )
+    session.add(dataset)
+    session.commit()
+    return dataset
+
+
+def create_image(*, session: Session, image_in: ImageCreate, dataset_id: int) -> models.Image:
+    """Create a new image associated with a dataset."""
+    image = models.Image(
+        **image_in.model_dump(), dataset_id=dataset_id
+    )
+    session.add(image)
+    session.commit()
+    return image

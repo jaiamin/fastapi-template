@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
+from app.enums import DatasetType
+
 
 # Base class for Image
 class ImageBase(BaseModel):
@@ -30,7 +32,10 @@ class ImagePublic(ImageBase):
 # Base class for Dataset
 class DatasetBase(BaseModel):
     title: str
-    tags: str
+    tags: DatasetType
+
+    class Config:
+        use_enum_values = True
 
 
 # Create class for Dataset

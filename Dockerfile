@@ -37,7 +37,7 @@ RUN poetry install --no-interaction --no-ansi
 WORKDIR /deepsee
 
 # Copy alembic.ini for database migrations
-COPY alembic.ini .
+COPY alembic.ini /
 
 # Expose port
 EXPOSE 8000

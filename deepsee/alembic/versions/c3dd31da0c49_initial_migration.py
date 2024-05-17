@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('creation_date', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
-    sa.Column('tags', sa.Enum('Detection', 'Classification', 'Segmentation', name='datasettype'), nullable=True),
+    sa.Column('tags', sa.Enum('detection', 'classification', 'segmentation', name='datasettype'), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

@@ -1,17 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from sqlalchemy import delete, func, select
+from fastapi import APIRouter, HTTPException, status
 
 from app import crud
 from app.api.deps import (
     CurrentUser,
     SessionDep
 ) 
-from app import models
 from app.schemas import (
     UserCreate,
     UserUpdate,
-    User,
     UserPublic,
 )
 
@@ -19,7 +15,7 @@ router = APIRouter()
 
 
 @router.get('/me', response_model=UserPublic)
-def get_current_user(current_user: CurrentUser):
+def get_current_user(*, current_user: CurrentUser):
     return current_user
 
 
