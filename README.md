@@ -9,4 +9,10 @@
 
 ______________________________________________________________________
 
-Coming soon...
+</div>
+
+## Build locally
+
+```bash
+docker compose up --build
+```
