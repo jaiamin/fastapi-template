@@ -1,6 +1,6 @@
 <div align='center'>
 
-<img alt='deepsee' src='media/DeepseeBanner.png' width='800px' style='max-width: 100%;'>
+<img alt='deepsee' src='media/deepsee-banner.png' width='800px' style='max-width: 100%;'>
 
 <br/>
 <br/>
