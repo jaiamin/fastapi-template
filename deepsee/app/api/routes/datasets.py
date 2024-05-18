@@ -11,7 +11,6 @@ from app.schemas import (
 
 router = APIRouter()
 
-
 @router.get('/', response_model=list[DatasetPublic])
 def get_datasets(*, session: SessionDep):
     """Retrieves all datasets stored on deepsee (with pagination)."""
@@ -50,3 +49,9 @@ def update_dataset():
 def delete_dataset():
     """Deletes a given dataset belonging to the current session user."""
     pass 
+
+
+@router.get('/{dataset_id}')
+def get_dataset(*, session: SessionDep):
+    """Retrieves a specific dataset stored on deepsee by ID."""
+    pass

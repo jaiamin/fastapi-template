@@ -83,7 +83,7 @@ def get_datasets(*, session: Session) -> list[models.Dataset]:
 
 def get_user_datasets(*, session: Session, uid: int) -> list[models.Dataset]:
     """Retrieve a user's datasets stored on deepsee."""
-    return session.query(models.Dataset).filter(models.Dataset.id == uid).all()
+    return session.query(models.Dataset).filter(models.Dataset.user_id == uid).all()
 
 
 def create_dataset(*, session: Session, dataset_in: DatasetCreate, uid: int) -> models.Dataset:
